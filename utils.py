@@ -12,6 +12,11 @@ def quat_rotate_inverse(q, v):
     c = q_vec * torch.bmm(q_vec.view(shape[0], 1, 3), v.view(shape[0], 3, 1)).squeeze(-1) * 2.0
     return a - b + c
 
+def quat_to_yaw(quat):
+    w,x, y, z = quat
+    yaw = np.arctan2(2*(w*z + x*y), 1 - 2*(y*y + z*z))
+    return yaw
+
 # Function to scale axis values - Joystick 1
 def scale_axis(index, value, threshold=0.05):
     """

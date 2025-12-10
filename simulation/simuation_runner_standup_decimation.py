@@ -55,7 +55,7 @@ def run_simulation(config_path='config.yaml', decimation=16):
     data.qpos = np.array([0., 0., 0.38, 1., 0., 0., 0.] + list(default_joint_angles))
     renderer = mujoco.Renderer(model)
 
-    grav_tens = torch.tensor([[0., 0., -1.]], device='cuda:0', dtype=torch.double)
+    grav_tens = torch.tensor([[0., 0., -1.]], device='cpu', dtype=torch.double)
 
     timecounter = 0
     step_counter = 0
@@ -112,7 +112,7 @@ def run_simulation(config_path='config.yaml', decimation=16):
 
                     body_vel = data.qvel[3:6].copy()
                     body_quat_reordered = np.array([body_quat[1], body_quat[2], body_quat[3], body_quat[0]])
-                    tensor_quat = torch.tensor(body_quat_reordered, device='cuda:0', dtype=torch.double).unsqueeze(0)
+                    tensor_quat = torch.tensor(body_quat_reordered, device='cpu', dtype=torch.double).unsqueeze(0)
                     gravity_body = quat_rotate_inverse(tensor_quat, grav_tens)
 
                     # Scale input data

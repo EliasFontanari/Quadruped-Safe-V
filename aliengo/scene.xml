@@ -1,0 +1,11 @@
+<mujoco>
+    <!-- Include your robot file -->
+    <include file="aliengo.xml"/>
+
+    <worldbody>
+        <!-- Obstacles -->
+        <body name="obstacle_0" pos="-2 2 0.">
+            <geom type="box" size="10 0.2 10" rgba="1 0 0 1"/>
+        </body>
+    </worldbody>
+</mujoco>

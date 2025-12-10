@@ -23,7 +23,9 @@ import os
 os.environ["XLA_FLAGS"] = os.environ.get("XLA_FLAGS", "") + " --xla_gpu_triton_gemm_any=True"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "False"
+os.environ["JAX_PLATFORM_NAME"] = "cpu"
 
+device = 'cpu'
 # -------------------------------
 # Initialize joystick input
 # -------------------------------
@@ -166,7 +168,7 @@ def run_simulation(config_path='config.yaml', decimation=10):
                         scaled_body_vel, scaled_commands, scaled_gravity_body,
                         scaled_joint_angles, scaled_joint_velocities, scaled_actions
                     ))
-                    obs = torch.tensor(input_data, dtype=torch.float32)
+                    obs = torch.tensor(input_data, dtype=torch.float32).to(device)
                     obs = actor_network.norm_obs(obs)
 
                     with torch.no_grad():

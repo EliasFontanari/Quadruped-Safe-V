@@ -145,7 +145,9 @@ def run_single_simulation(config, actor_network, decimation=10, max_steps=2000, 
         # -------------------------------
         qpos_after = data.qpos.copy()
         body_quat_after = qpos_after[3:7]
-        inclination_after = 2 * np.arcsin(np.sqrt(body_quat_after[1]**2 + body_quat_after[2]**2)) * (180 / np.pi)
+        # inclination_after = 2 * np.arcsin(np.sqrt(body_quat_after[1]**2 + body_quat_after[2]**2)) * (180 / np.pi)
+        inclination_after = (np.pi/2 - np.arcsin(1-2*(body_quat_after[1]**2+body_quat_after[2]**2))) * (180 / np.pi)
+
 
         if check_fallen(qpos_after, inclination_after):
             fallen_flag = 1
