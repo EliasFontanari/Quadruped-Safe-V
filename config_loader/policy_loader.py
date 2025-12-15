@@ -10,7 +10,6 @@ def load_config(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
 
-
 # Actor Network Class
 class ActorNetwork(nn.Module):
     def __init__(self, input_dim, action_dim, mlp_units=[512, 256, 128], activation=nn.ELU):
@@ -79,3 +78,4 @@ def load_critic_network(config):
     print(state_dict.keys())
     critic_network.load_state_dict(critic_state_dict, strict=False)
     return critic_network
+
