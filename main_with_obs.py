@@ -73,7 +73,7 @@ def run_single_simulation(config, actor_network, decimation=16, max_steps=50000,
     scaling_factors = config['scaling']
 
     # Init model and data
-    model = mujoco.MjModel.from_xml_path("aliengo/random_scene.xml")
+    model = mujoco.MjModel.from_xml_path("aliengo/scene.xml")
     model.opt.timestep = timestep
     data = mujoco.MjData(model)
     mujoco.mj_forward(model, data)

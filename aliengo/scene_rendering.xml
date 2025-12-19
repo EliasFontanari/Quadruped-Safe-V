@@ -1,6 +1,6 @@
 <mujoco>
     <!-- Include your robot file -->
-    <include file="aliengo_simplified2.xml"/>
+    <include file="aliengo.xml"/>
 
     <worldbody>
         <!-- Obstacles -->

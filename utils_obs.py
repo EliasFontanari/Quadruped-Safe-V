@@ -31,7 +31,7 @@ def lidar_scan(model,data,view_angle,n_rays,body_name, ray_amp, n_sector):
     # excluded_bodies.append(mujoco.mj_name2id(model,mujoco.mjtObj.mjOBJ_BODY,'trunk'))
     for i in range(angles_plus_yaw.shape[0]):
         geom_id = np.array([1], dtype=np.int32)
-        distances[i] = mujoco.mj_ray(model,data,data.body(body_name).xpos+np.array([0,0,0.1]),np.array([np.cos(angles_plus_yaw[i]),np.sin(angles_plus_yaw[i]),0],dtype=np.float64),None,1,-1,geom_id)
+        distances[i] = mujoco.mj_ray(model,data,data.body(body_name).xpos+np.array([0,0,0.10]),np.array([np.cos(angles_plus_yaw[i]),np.sin(angles_plus_yaw[i]),0],dtype=np.float64),None,1,-1,geom_id)
     distances = np.where(distances == -1,1e6,distances)
     distances = np.where(distances <= ray_amp,distances,1e6)
 
@@ -45,7 +45,7 @@ def lidar_scan(model,data,view_angle,n_rays,body_name, ray_amp, n_sector):
     # plt.grid(True)
     # plt.xlim(-10, 10)
     # plt.ylim(-10, 10)
-    # plt.plot(distances * np.cos(angles_plus_yaw-yaw),distances * np.sin(angles_plus_yaw-yaw),'o')
+    # plt.plot(distances * np.cos(angles_plus_yaw),distances * np.sin(angles_plus_yaw),'o')
     # plt.show()
     # scan = np.vstack((angles_plus_yaw,distances)) 
 
@@ -135,3 +135,17 @@ def generate_pairs(data):
             ).any():
                 pairs.append(np.hstack((data[i, j, :], data[i, j + 1, :])))
     return np.array(pairs)
+
+def list_bodies(model):
+    body_names = [
+        mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_BODY, i)
+        for i in range(model.nbody)
+    ]
+    return body_names
+
+def list_geoms(model):
+    geom_names = [
+        mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, i)
+        for i in range(model.ngeom)
+    ]
+    return geom_names

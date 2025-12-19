@@ -2,6 +2,7 @@ import jax.numpy as jnp
 import numpy as np
 import torch
 from flax import linen as nn
+import jax
 
 def torch_to_jax(torch_tensor):
     """Convert PyTorch tensor to JAX array."""
@@ -279,7 +280,7 @@ state_dict = torch.load(config['paths']['policy_path'], map_location={'cuda:1': 
 mean = jnp.array(state_dict['running_mean_std.running_mean'])
 std =   jnp.array(state_dict['running_mean_std.running_var'])
 
-
+@jax.jit
 def norm_obs_jax(x):
     return (x - mean) / jnp.sqrt(std + 1e-6) 
 
