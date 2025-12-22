@@ -48,12 +48,13 @@ scaling_factors = config['scaling']
 model = mujoco.MjModel.from_xml_path("aliengo/scene.xml")
 model.opt.timestep = timestep
 data = mujoco.MjData(model)
+q0 = np.array([0., 0., 0.5, 0., 1., 0., 0.] + list(default_joint_angles))
+data.qpos[:]=q0
 mujoco.mj_forward(model, data)
 
 mjx_model = mjx.put_model(model)
 mjx_data = mjx.put_data(model,data)
-q0 = np.array([0., 0., 0.5, 1., 0., 0., 0.] + list(default_joint_angles))
-mjx_data.qpos.at[:].set(q0)
+# mjx_data.qpos.at[:].set(q0)
 mjx_data = mjx.forward(mjx_model, mjx_data)
 
 obstacles_list_id = []
@@ -633,7 +634,10 @@ def run_single_step(q_init, decimation=16, noise_std=1.0, warmup_time=1.0, seed_
 
         # === Step sim ===
         # torques_noisy = clip_torques_in_groups(torques)
-        mjx_data_sim.ctrl.at[:].set(torques)
+        ctrl = mjx_data_sim.ctrl.at[:].set(torques)
+
+        mjx_data_sim = mjx_data_sim.replace(ctrl=ctrl)
+
         mjx.step(mjx_model, mjx_data_sim)        
 
         qpos_after = mjx_data_sim.qpos.copy()
@@ -711,4 +715,4 @@ def run_batch_simulations(n_episodes=100, save_path="results", config_path="conf
 
 
 if __name__ == "__main__":
-    run_batch_simulations(n_episodes=8192,   save_path="observation_datasets", noise_std=10.0)
+    run_batch_simulations(n_episodes=100,   save_path="observation_datasets", noise_std=10.0)

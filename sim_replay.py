@@ -26,13 +26,13 @@ def visualize_simulation(model_path, qpos_trajectory, qvel_trajectory=None,
     else:
         qpos_traj = qpos_trajectory
     
-    n_steps = qpos_traj.shape[1]
+    n_steps = qpos_traj.shape[0]
     dt = dt_single * decimation
     
     print(f"Visualizing trajectory with {n_steps} steps at {1/dt} frequency")
     print("Press ESC to exit, SPACE to pause")
     
-    with mujoco.viewer.launch(model, data) as viewer:
+    with mujoco.viewer.launch_passive(model, data) as viewer:
         step = 0
         paused = False
         
@@ -41,7 +41,7 @@ def visualize_simulation(model_path, qpos_trajectory, qvel_trajectory=None,
             
             if not paused:
                 # Set state from trajectory
-                data.qpos[:] = qpos_traj[:,step]
+                data.qpos[:] = qpos_traj[step,:]
                 
                 # Forward kinematics to update visualizations
                 mujoco.mj_forward(model, data)
@@ -64,11 +64,11 @@ def visualize_simulation(model_path, qpos_trajectory, qvel_trajectory=None,
             if elapsed < dt:
                 time.sleep(dt - elapsed)
 
-data_q = np.load('data_mjx.npy')[:]
-data_q = data_q[9,:19,:]
+data_q = np.load('traj_mjx_test.npy')
+# data_q = data_q[9,:19,:]
 
 visualize_simulation(
-    model_path="aliengo/scene_rendering.xml",
+    model_path="aliengo/aliengo.xml",
     qpos_trajectory=data_q,  # shape: [n_steps, nq]
     qvel_trajectory=None,  # shape: [n_steps, nv]
     loop=True
