@@ -56,7 +56,7 @@ def lidar_scan(model,data,view_angle,n_rays,body_name, ray_amp, n_sector):
 def generate_obstacles_xml(file_name="aliengo/random_scene.xml", num_obstacles=200,x_lim=10,y_lim=10,radius_lim=[0.05,0.2],height_lim=[0.2,1]):
     # Start the worldbody XML
     xml_content = '''<mujoco>
-    <include file="aliengo.xml"/>
+    <include file="aliengo_simplified2.xml"/>
     <worldbody>
     '''
     # Add 100 obstacles (cylinders) with random positions
@@ -149,3 +149,5 @@ def list_geoms(model):
         for i in range(model.ngeom)
     ]
     return geom_names
+
+generate_obstacles_xml(num_obstacles=n_obs)

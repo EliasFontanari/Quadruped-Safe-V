@@ -3,6 +3,14 @@ import numpy as np
 import torch
 from flax import linen as nn
 import jax
+from rl_games.algos_torch.running_mean_std import RunningMeanStd
+import yaml
+
+# Function to load YAML configuration
+def load_config(file_path):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
+
 
 def torch_to_jax(torch_tensor):
     """Convert PyTorch tensor to JAX array."""
@@ -135,12 +143,16 @@ class ActorNetworkPyTorch(torch.nn.Module):
             prev_dim = unit
         self.actor_mlp = torch.nn.Sequential(*layers)
         self.mu = torch.nn.Linear(mlp_units[-1], action_dim)
+        self.running_mean_std = RunningMeanStd((input_dim,))
     
     def forward(self, x):
         features = self.actor_mlp(x)
         mu = self.mu(features)
         return mu
 
+    def norm_obs(self, observation):
+        with torch.no_grad():
+            return self.running_mean_std(observation)
 
 # ============ EXAMPLE USAGE ============
 
@@ -165,6 +177,10 @@ for key in actor_state_dict.keys():
 torch_actor = ActorNetworkPyTorch(input_dim=45, action_dim=12)
 
 # Load the extracted weights
+config = load_config('config.yaml')
+state_dict = torch.load(config['paths']['policy_path'], map_location={'cuda:1': 'cuda:0'})['model']
+actor_state_dict = {k.replace('a2c_network.', ''): v for k, v in state_dict.items()
+                    if k.startswith('a2c_network.actor_mlp') or k.startswith('a2c_network.mu')or k.startswith('running_mean_std.running_mean') or k.startswith('running_mean_std.running_var') or k.startswith('running_mean_std.count')}
 torch_actor.load_state_dict(actor_state_dict)
 print("\n✓ Weights loaded successfully!")
 
@@ -282,8 +298,39 @@ std =   jnp.array(state_dict['running_mean_std.running_var'])
 
 @jax.jit
 def norm_obs_jax(x):
-    return (x - mean) / jnp.sqrt(std + 1e-6) 
+    return jnp.clip((x - mean) / jnp.sqrt(std + 1e-5),-5.0,5.0)
 
+def norm_obs_running_jax(x):
+    x_norm = (x - torch_to_jax(torch_actor.running_mean_std.running_mean) ) / np.sqrt(torch_to_jax(torch_actor.running_mean_std.running_var) + 1e-5)
+    return np.clip(x_norm,-5.0,5.0) 
+
+
+
+if False:
+    for k in range(100):
+        # Create test input (45 dimensions)
+        test_input_np = 5.0+2*np.random.randn(1, 45).astype(np.float32)
+        print(f'Test input {test_input_np}')
+        
+        test_input_torch = torch.from_numpy(test_input_np)
+        test_input_jax = jnp.array(test_input_np)
+
+        # PyTorch forward pass
+        # torch_actor.eval()
+        torch_actor.eval()
+        with torch.no_grad():
+            torch_output = torch_actor(torch_actor.norm_obs(test_input_torch)).numpy()
+
+        # Flax forward pass
+        flax_output = flax_actor.apply(flax_variables, norm_obs_jax(test_input_jax))
+
+        # print("\nPyTorch output shape:", torch_output.shape)
+        # print("Flax output shape:", flax_output.shape)
+        # print("\nPyTorch output (first 5):", torch_output[0, :5])
+        # print("Flax output (first 5):", flax_output[0, :5])
+        # print("\nMax difference:", np.max(np.abs(torch_output - np.array(flax_output))))
+        # print("✓ Outputs match!" if np.allclose(torch_output, flax_output, atol=1e-5) else "✗ Outputs don't match")
+        print(f'At step {k} running_mean {torch_actor.running_mean_std.running_mean[:5]}\n')
 
 
 

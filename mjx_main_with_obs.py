@@ -361,7 +361,7 @@ def run_single_simulation( decimation=16, max_steps=10000, noise_std=1.0, warmup
 
             # # print(f' Difference obs_torch-jax {np.linalg.norm(obs.numpy() - obs_jax)}')
             # current_actions = jax.lax.stop_gradient(flax_actor.apply(flax_variables,obs_jax))
-
+        
         qDes = 0.5 * current_actions + default_joint_angles
         torques = kp_custom * (qDes - joint_angles) - kd_custom * joint_velocities
         torques = swap_legs(torques)

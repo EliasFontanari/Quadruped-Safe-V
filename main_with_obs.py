@@ -73,7 +73,7 @@ def run_single_simulation(config, actor_network, decimation=16, max_steps=50000,
     scaling_factors = config['scaling']
 
     # Init model and data
-    model = mujoco.MjModel.from_xml_path("aliengo/scene.xml")
+    model = mujoco.MjModel.from_xml_path("aliengo/random_scene.xml")
     model.opt.timestep = timestep
     data = mujoco.MjData(model)
     mujoco.mj_forward(model, data)
@@ -164,6 +164,8 @@ def run_single_simulation(config, actor_network, decimation=16, max_steps=50000,
                     (np.arctan2((target[1] - robot_pos[1]),(target[0] - robot_pos[0])) - yaw)*yaw_gain     # yaw_rate
                     ])
 
+                    commands = np.array([-0.,0,0])
+
                     body_vel = data.qvel[3:6].copy()
                     body_quat_reordered = np.array([body_quat[1], body_quat[2], body_quat[3], body_quat[0]])
                     tensor_quat = torch.tensor(body_quat_reordered, device=device, dtype=torch.double).unsqueeze(0)
@@ -179,8 +181,8 @@ def run_single_simulation(config, actor_network, decimation=16, max_steps=50000,
 
                     input_data = np.concatenate((scaled_body_vel, scaled_commands, scaled_gravity_body,
                                                 scaled_joint_angles, scaled_joint_velocities, scaled_actions))
-                    obs = torch.tensor(input_data, dtype=torch.float32)
-                    obs = actor_network.norm_obs(obs)
+                    # obs = torch.tensor(input_data, dtype=torch.float32)
+                    # obs = actor_network.norm_obs(obs)
 
                     obs_jax = norm_obs_jax(input_data)
 
