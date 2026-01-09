@@ -24,9 +24,9 @@ from PIL import Image
 
 import os
 
-os.environ['XLA_FLAGS'] = '--xla_gpu_autotune_level=0'
-jax.config.update("jax_compilation_cache_dir", "/tmp/jax_cache")
-jax.config.update("jax_persistent_cache_min_entry_size_bytes", -1)
+# os.environ['XLA_FLAGS'] = '--xla_gpu_autotune_level=0'
+# jax.config.update("jax_compilation_cache_dir", "/tmp/jax_cache")
+# jax.config.update("jax_persistent_cache_min_entry_size_bytes", -1)
 # jax.config.update("jax_enable_x64", True)
 # === Thresholds and constants ===
 INCLINATION_THRESHOLD = 45.0  # degrees
@@ -371,7 +371,7 @@ def step_with_torques_2(mjx_model, mjx_data):
         joint_velocities = swap_legs(qvel[6:])
 
         
-        commands = jnp.array([0,0,0])
+        commands = jnp.array([0.25,0,0])
         body_vel = mjx_data.qvel[3:6].copy()
         gravity_body = quat_rotate_inverse(body_quat, grav_tens)
         scaled_body_vel = body_vel * scaling_factors['body_ang_vel']
@@ -406,15 +406,12 @@ def step_with_torques_2(mjx_model, mjx_data):
         # Step simulation (returns new data)
     mjx_data = mjx.step(mjx_model, mjx_data)
     
-    return mjx_data, mjx_data.qpos.copy(), mjx_data.qvel
-
-
-
+    return mjx_data
 
 if __name__ == "__main__":
-    RENDERING = True
+    RENDERING = False
 
-    n_envs = 12
+    n_envs = 32
     mjx_model = mjx.put_model(model)
     mjx_data = mjx.put_data(model,data)
     mjx_data = mjx.forward(mjx_model, mjx_data)
@@ -432,7 +429,7 @@ if __name__ == "__main__":
 
     n_step = 5000
     states = []
-    states.append(batch_state.qpos)
+    states.append(jnp.hstack((batch_state.qpos.copy(),batch_state.qvel.copy())))
     print(f'Loop step')
     # batch_state, qpos, _ = step_with_torques(mjx_model, batch_state, torque)
     # states.append(qpos)
@@ -445,13 +442,13 @@ if __name__ == "__main__":
                 # torques = compute_action_true(mjx_data)
 
             # mjx_data, q, v = step_with_torques_2(mjx_model, mjx_data)
-            batch_state, q, v = jit_step(mjx_model, batch_state)
+            batch_state= jit_step(mjx_model, batch_state)
 
 
             # Usage
             # mjx_data, qpos, _ = step_with_torques(mjx_model, mjx_data, torque)
             # states.append(state)
-            states.append(batch_state.qpos.copy())
+            states.append(jnp.hstack((batch_state.qpos.copy(),batch_state.qvel.copy())))
             # print(f'Progress: {i}/{n_step}')
             # if i % 20 == 0:
             #     print(f"Step {i}: pos {q}, vel {v}")
@@ -460,9 +457,13 @@ if __name__ == "__main__":
         xml_path = 'aliengo/scene_rendering.xml' 
         model_rendering = mujoco.MjModel.from_xml_path(xml_path)
         data_robots = []
+        q0 = np.array([0., 0., 0.38, 1., 0., 0., 0.] + list(default_joint_angles))
+
         for _ in range(n_envs):
             data_robots.append(mujoco.MjData(model_rendering))
-            
+            data_robots[-1].qpos[:]=q0
+            mujoco.mj_forward(model, data_robots[-1])
+
         # Visual options for ghost
         vopt2 = mujoco.MjvOption()
         vopt2.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = False
@@ -478,20 +479,21 @@ if __name__ == "__main__":
         
                     batch_state, q, v = jit_step(mjx_model, batch_state)
                     states.append(batch_state.qpos.copy())
-                                    
-                    viewer.user_scn.ngeom = 0
-                    for j in range(1,len(data_robots)):
-                        # Add ghost robot
-                        data_robots[j].qpos = states[-1][j]
-                        mujoco.mj_forward(model_rendering, data_robots[j])
-                        
-                        # Add ghost to scene
-                        mujoco.mjv_addGeoms(
-                            model_rendering, data_robots[j], vopt2, pert, catmask, viewer.user_scn
-                        )
 
-                    # Update main robot
-                    viewer.sync()
+                    if i % 10 == 0:                 
+                        viewer.user_scn.ngeom = 0
+                        for j in range(1,len(data_robots)):
+                            # Add ghost robot
+                            data_robots[j].qpos = states[-1][j]
+                            mujoco.mj_forward(model_rendering, data_robots[j])
+                            
+                            # Add ghost to scene
+                            mujoco.mjv_addGeoms(
+                                model_rendering, data_robots[j], vopt2, pert, catmask, viewer.user_scn
+                            )
+
+                        # Update main robot
+                        viewer.sync()
 
     end = time.time()
     states = np.array(states)

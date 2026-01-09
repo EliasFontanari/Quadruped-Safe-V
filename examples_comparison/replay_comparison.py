@@ -8,15 +8,22 @@ import mediapy as media
 from pathlib import Path
 import mujoco.viewer
 from tqdm import tqdm
-
+import time
 if __name__ == "__main__":
-    data_q = np.load('traj_mjx_test.npy')
+    data_q = np.load('trajectory_comparison_both.npy')
     print(data_q.shape)
 
     n_envs = data_q.shape[0]
     n_step = data_q.shape[1]
 
-    xml_path = 'aliengo/scene_rendering.xml' 
+    # data_original = np.load('../traj_still.npy')
+
+    # print(data_original[:,:data_q.shape[2]].shape)
+
+    # data_q[1] = data_original[:data_q.shape[1],:data_q.shape[2]]
+
+
+    xml_path = '../aliengo/aliengo.xml' 
     model_rendering = mujoco.MjModel.from_xml_path(xml_path)
     data_robots = []
 
@@ -29,9 +36,11 @@ if __name__ == "__main__":
 
     # Visual options for ghost
     vopt2 = mujoco.MjvOption()
-    vopt2.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = False
+    vopt2.flags[mujoco.mjtVisFlag.mjVIS_TRANSPARENT] = True
     pert = mujoco.MjvPerturb()
     catmask = mujoco.mjtCatBit.mjCAT_DYNAMIC
+
+    print('-'*70 +'\n' + ' '*22 + 'JAX robot transparent' +' '*22 +'\n' + '-'*70 +'\n' )
     
     # Create passive viewer
     with mujoco.viewer.launch_passive(
@@ -39,7 +48,7 @@ if __name__ == "__main__":
     ) as viewer:
         while viewer.is_running():
             for i in tqdm(range(0,n_step)):        
-                 
+                step_start = time.time() 
                 viewer.user_scn.ngeom = 0
                 for j in range(len(data_robots)):
                     # Add ghost robot
@@ -54,3 +63,6 @@ if __name__ == "__main__":
 
                 # Update main robot
                 viewer.sync()
+                time_until_next_step = model_rendering.opt.timestep - (time.time() - step_start)
+                if time_until_next_step > 0:
+                    time.sleep(time_until_next_step)

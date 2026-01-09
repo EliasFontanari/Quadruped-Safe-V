@@ -70,7 +70,7 @@ def visualize_simulation(model_path, qpos_trajectory, qvel_trajectory=None,
 
 data_q = np.load('traj_mjx_test.npy')
 print(data_q.shape)
-data_q = data_q[8]
+data_q = data_q[2]
 
 # data_q = data_q[0]
 
