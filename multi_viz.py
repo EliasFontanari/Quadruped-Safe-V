@@ -10,7 +10,7 @@ import mujoco.viewer
 from tqdm import tqdm
 
 if __name__ == "__main__":
-    data_q = np.load('traj_mjx_test.npy')
+    data_q = np.load('examples_comparison/batched_sim.npy')
     print(data_q.shape)
 
     n_envs = data_q.shape[0]
