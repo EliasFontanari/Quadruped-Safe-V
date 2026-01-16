@@ -8,8 +8,9 @@
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceFolder}/examples_comparison/quadruped_comparison_single.py",
             "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/examples_comparison",
             "justMyCode": false
         }
     ]
