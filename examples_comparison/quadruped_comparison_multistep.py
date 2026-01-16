@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from functools import partial
+import os
 
 
 # Optional: Force CPU if you have CUDA issues
@@ -20,6 +21,9 @@ from functools import partial
 
 # Model Definition - Double Pendulum
 XML_MODEL_PATH = '../aliengo/aliengo.xml'
+
+os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+os.environ['XLA_GPU_TRITON_GEMM_ANY'] = 'true'
 
 def step_CPU(model, data, control):
     data.ctrl[:] = control
@@ -103,6 +107,19 @@ def main():
     # Load model
     print("\n1. Loading MuJoCo model...")
     mj_model = mujoco.MjModel.from_xml_path(XML_MODEL_PATH)
+
+    mj_model.opt.iterations = 2
+    mj_model.opt.ls_iterations = 2
+
+    # mj_model.opt.maxhullvert = 64
+
+    # Disable ALL implicit collisions
+    for i in range(mj_model.ngeom):
+        mj_model.geom_contype[i] = 0
+        mj_model.geom_conaffinity[i] = 0
+    
+    # jax.profiler.start_trace("/tmp/tensorboard_logs")
+    
     mjx_model = mjx.put_model(mj_model)
     print(f"   - DoF: {mj_model.nq}")
     print(f"   - Actuators: {mj_model.nu}")
@@ -146,8 +163,8 @@ def main():
     # MJX
     print(f'Jax execution')
     start = time.time()
-    trajectory_jax, final_data_jax = simulate_trajectory_scan(
-        mjx_model, mjx_data, controls
+    trajectory_jax, final_data_jax = simulate_trajectory_JAX(
+        mjx_model, mjx_data, n_steps, controls
     )
     # trajectory_jax, final_data_jax = simulate_trajectory_scan(
     #     mjx_model, mjx_data, n_steps,controls
@@ -158,8 +175,8 @@ def main():
 
     print(f'Jax execution')
     start = time.time()
-    trajectory_jax, final_data_jax = simulate_trajectory_scan(
-        mjx_model, mjx_data, controls
+    trajectory_jax, final_data_jax = simulate_trajectory_JAX(
+        mjx_model, mjx_data, n_steps, controls
     )
     # trajectory_jax, final_data_jax = simulate_trajectory_scan(
     #     mjx_model, mjx_data, n_steps,controls
@@ -204,6 +221,8 @@ def main():
 
     res = np.array(traj_batch)
     np.save('batched_sim.npy', res)
+
+    # jax.profiler.stop_trace()
 
     # fig, axes = plt.subplots(3,1)
     # time_sim = np.arange(n_steps+1) * dt

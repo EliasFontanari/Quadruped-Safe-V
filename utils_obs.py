@@ -31,14 +31,14 @@ def lidar_scan(model,data,view_angle,n_rays,body_name, ray_amp, n_sector):
     # excluded_bodies.append(mujoco.mj_name2id(model,mujoco.mjtObj.mjOBJ_BODY,'trunk'))
     for i in range(angles_plus_yaw.shape[0]):
         geom_id = np.array([1], dtype=np.int32)
-        distances[i] = mujoco.mj_ray(model,data,data.body(body_name).xpos+np.array([0,0,0.10]),np.array([np.cos(angles_plus_yaw[i]),np.sin(angles_plus_yaw[i]),0],dtype=np.float64),None,1,-1,geom_id)
+        distances[i] = mujoco.mj_ray(model,data,data.qpos[:3] + np.array([0,0,0.10]),np.array([np.cos(angles_plus_yaw[i]),np.sin(angles_plus_yaw[i]),0],dtype=np.float64),None,1,-1,geom_id)
     distances = np.where(distances == -1,1e6,distances)
     distances = np.where(distances <= ray_amp,distances,1e6)
 
     angles_sector = np.linspace(angles_plus_yaw[0], angles_plus_yaw[-1], n_sector+1)
     scan = np.zeros((2,n_sector))
     for i in range(n_sector):
-        indexes = np.where((angles_plus_yaw >= angles_sector[i]) & (angles_plus_yaw < angles_sector[i+1]))[0]
+        indexes = np.where((angles_plus_yaw >= angles_sector[i]) & (angles_plus_yaw <= angles_sector[i+1]))[0]
         scan[0,i] = np.min(distances[indexes])
         scan[1,i] = (angles_sector[i] + angles_sector[i+1])/2
     # plt.figure()
@@ -53,10 +53,12 @@ def lidar_scan(model,data,view_angle,n_rays,body_name, ray_amp, n_sector):
 
 # Python script to generate MuJoCo XML with 100 cylindrical obstacles
 
-def generate_obstacles_xml(file_name="aliengo/random_scene.xml", num_obstacles=200,x_lim=10,y_lim=10,radius_lim=[0.05,0.2],height_lim=[0.2,1]):
+def generate_obstacles_xml(file_name="aliengo/random_scene.xml", num_obstacles=200,x_lim=10,y_lim=10,radius_lim=[0.05,0.2],height_lim=[0.2,1],seed=0):
+    if seed == None: file_name=f"aliengo/random_scene.xml"
+    else: file_name=f"aliengo/random_scene_{seed}.xml"
     # Start the worldbody XML
     xml_content = '''<mujoco>
-    <include file="aliengo_simplified2.xml"/>
+    <include file="aliengo.xml"/>
     <worldbody>
     '''
     # Add 100 obstacles (cylinders) with random positions
@@ -71,7 +73,7 @@ def generate_obstacles_xml(file_name="aliengo/random_scene.xml", num_obstacles=2
         
         # Define the obstacle's XML entry
         obstacle_xml = f'''
-        <body name="obstacle_{i}" pos="{x_pos} {y_pos} {z_pos}">
+        <body name="obstacle_{i}" pos="{x_pos} {y_pos} {z_pos}" mocap="true">
             <geom type="capsule" size="{np.random.uniform(radius_lim[0],radius_lim[1])} {heigth}" rgba="0 0 1 1"/>
         </body>
         '''
@@ -149,5 +151,3 @@ def list_geoms(model):
         for i in range(model.ngeom)
     ]
     return geom_names
-
-generate_obstacles_xml(num_obstacles=n_obs)

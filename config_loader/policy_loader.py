@@ -61,7 +61,7 @@ def load_actor_network(config):
     input_dim = 45
     action_dim = 12
     actor_network = ActorNetwork(input_dim=input_dim, action_dim=action_dim)
-    state_dict = torch.load(config['paths']['policy_path'], map_location={'cuda:1': 'cuda:0'})['model']
+    state_dict = torch.load(config['paths']['policy_path'], map_location='cpu')['model']
     actor_state_dict = {k.replace('a2c_network.', ''): v for k, v in state_dict.items()
                         if k.startswith('a2c_network.actor_mlp') or k.startswith('a2c_network.mu')or k.startswith('running_mean_std.running_mean') or k.startswith('running_mean_std.running_var') or k.startswith('running_mean_std.count')}
     actor_network.load_state_dict(actor_state_dict)

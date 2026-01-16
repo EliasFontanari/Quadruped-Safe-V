@@ -75,7 +75,7 @@ data_q = data_q[2]
 # data_q = data_q[0]
 
 visualize_simulation(
-    model_path="aliengo/scene_rendering.xml",
+    model_path="aliengo/aliengo.xml",
     qpos_trajectory=data_q,  # shape: [n_steps, nq]
     qvel_trajectory=None,  # shape: [n_steps, nv]
     loop=True

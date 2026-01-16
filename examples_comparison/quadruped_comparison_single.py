@@ -20,7 +20,7 @@ os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
 os.environ['XLA_GPU_TRITON_GEMM_ANY'] = 'true'
 
 # Optional: Force CPU if you have CUDA issues
-jax.config.update("jax_enable_x64", True)
+# jax.config.update("jax_enable_x64", True)
 # jax.config.update('jax_platform_name', 'cpu')
 
 # Model Definition - Double Pendulum
@@ -105,45 +105,45 @@ def main():
     print("Simulation complete!")
     print("=" * 70)
 
-    with jax.profiler.trace("/tmp/jax-trace", create_perfetto_trace=True):
-            
-        # batched comparison
-        n_envs = 32
-        rng = jax.random.PRNGKey(0)
-        rng, batch_rng = jax.random.split(rng,2)
-        batch_rng = jax.random.split(batch_rng, n_envs)
-        batch_state = jax.vmap(lambda rng: mjx_data.replace(qpos=mjx_data.qpos.at[:2].set(jax.random.uniform(rng, (2,),minval=-5,maxval=5))))(batch_rng)
+    # with jax.profiler.trace("traces/", create_perfetto_trace=True):
+    # batched comparison
+    n_envs = 32
+    rng = jax.random.PRNGKey(0)
+    rng, batch_rng = jax.random.split(rng,2)
+    batch_rng = jax.random.split(batch_rng, n_envs)
+    batch_state = jax.vmap(lambda rng: mjx_data.replace(qpos=mjx_data.qpos.at[:2].set(jax.random.uniform(rng, (2,),minval=-5,maxval=5))))(batch_rng)
 
 
-        jit_batch_sim = jax.jit(jax.vmap(step_JAX, in_axes=(None, 0, None)))
-        
-        print(f'Jax execution batched: jit compilation')
-        start = time.time()
+    jit_batch_sim = jax.jit(jax.vmap(step_JAX, in_axes=(None, 0, None)))
+    
+    print(f'Jax execution batched: jit compilation')
+    start = time.time()
 
-        batch_state = jit_batch_sim(mjx_model,batch_state,controls[0])
-        end = time.time()
-        elapsed_time = end - start
-        print(f'Elapsed time: {elapsed_time} seconds\n\n')
+    batch_state = jit_batch_sim(mjx_model,batch_state,controls[0])
+    end = time.time()
+    elapsed_time = end - start
+    print(f'Elapsed time: {elapsed_time} seconds\n\n')
 
-        batch_state = jax.vmap(lambda rng: mjx_data.replace(qpos=mjx_data.qpos.at[:2].set(jax.random.uniform(rng, (2,),minval=-5,maxval=5))))(batch_rng)
-        
-        traj_batch = jnp.zeros((n_envs,controls.shape[0] + 1, mj_model.nq + mj_model.nv))
-        traj_batch = traj_batch.at[:,0].set(jnp.hstack((batch_state.qpos,batch_state.qvel)))
+    batch_state = jax.vmap(lambda rng: mjx_data.replace(qpos=mjx_data.qpos.at[:2].set(jax.random.uniform(rng, (2,),minval=-5,maxval=5))))(batch_rng)
+    
+    traj_batch = jnp.zeros((n_envs,controls.shape[0] + 1, mj_model.nq + mj_model.nv))
+    traj_batch = traj_batch.at[:,0].set(jnp.hstack((batch_state.qpos,batch_state.qvel)))
 
-        print(f'Jax execution batched: for loop')
-        start = time.time()
+    print(f'Jax execution batched: for loop')
+    start = time.time()
 
-        for i in range(controls.shape[0]):
-            batch_state = jit_batch_sim(mjx_model,batch_state,controls[i])
-            traj_batch = traj_batch.at[:,i].set(jnp.hstack((batch_state.qpos,batch_state.qvel)))
-        
-        end = time.time()
-        elapsed_time = end - start
-        print(f'Jax execution batched without compilation in for loop: time elapsed {elapsed_time} seconds, steps per second {n_steps/(elapsed_time+1e-6)}')
+    for i in range(controls.shape[0]):
+        batch_state = jit_batch_sim(mjx_model,batch_state,controls[i])
+        traj_batch = traj_batch.at[:,i].set(jnp.hstack((batch_state.qpos,batch_state.qvel)))
+    
+    end = time.time()
+    elapsed_time = end - start
+    print(f'Jax execution batched without compilation in for loop: time elapsed {elapsed_time} seconds, steps per second {n_steps/(elapsed_time+1e-6)}')
 
+    traj_batch.block_until_ready()
 
-        res = np.array(traj_batch)
-    jax.profiler.save_device_memory_profile("memory_x32.prof")
+    res = np.array(traj_batch)
+    # jax.profiler.save_device_memory_profile("memory_x32.prof")
 
     np.save('batched_sim.npy', res)
 

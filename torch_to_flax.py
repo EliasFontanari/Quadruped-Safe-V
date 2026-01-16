@@ -6,6 +6,8 @@ import jax
 from rl_games.algos_torch.running_mean_std import RunningMeanStd
 import yaml
 
+device = 'cpu'
+
 # Function to load YAML configuration
 def load_config(file_path):
     with open(file_path, 'r') as file:
@@ -178,7 +180,7 @@ torch_actor = ActorNetworkPyTorch(input_dim=45, action_dim=12)
 
 # Load the extracted weights
 config = load_config('config.yaml')
-state_dict = torch.load(config['paths']['policy_path'], map_location={'cuda:1': 'cuda:0'})['model']
+state_dict = torch.load(config['paths']['policy_path'], map_location=device)['model']
 actor_state_dict = {k.replace('a2c_network.', ''): v for k, v in state_dict.items()
                     if k.startswith('a2c_network.actor_mlp') or k.startswith('a2c_network.mu')or k.startswith('running_mean_std.running_mean') or k.startswith('running_mean_std.running_var') or k.startswith('running_mean_std.count')}
 torch_actor.load_state_dict(actor_state_dict)
@@ -292,7 +294,7 @@ output = flax_actor.apply(loaded_variables, x)
 from config_loader.policy_loader import load_config
 config = load_config("config.yaml")
 
-state_dict = torch.load(config['paths']['policy_path'], map_location={'cuda:1': 'cuda:0'})['model']
+state_dict = torch.load(config['paths']['policy_path'], map_location=device)['model']
 mean = jnp.array(state_dict['running_mean_std.running_mean'])
 std =   jnp.array(state_dict['running_mean_std.running_var'])
 
