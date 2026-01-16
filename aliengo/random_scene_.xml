@@ -1,0 +1,167 @@
+<mujoco>
+    <include file="aliengo.xml"/>
+    <worldbody>
+    
+        <body name="obstacle_0" pos="1.627572791351251 2.303359444332589 0.6460351813359593" mocap="true">
+            <geom type="capsule" size="0.16481485588494513 0.6460351813359593" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_1" pos="2.501388179700389 -1.7599431045375935 0.9032814938991485" mocap="true">
+            <geom type="capsule" size="0.07671281822714426 0.9032814938991485" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_2" pos="1.7641580741112657 -0.8218137306497972 0.9454634746737409" mocap="true">
+            <geom type="capsule" size="0.09025830902053814 0.9454634746737409" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_3" pos="-0.7082837938260438 -2.54146461151491 0.34602050637312964" mocap="true">
+            <geom type="capsule" size="0.08904184026866771 0.34602050637312964" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_4" pos="2.7253809364022086 -1.7203715719378891 0.9115632153716917" mocap="true">
+            <geom type="capsule" size="0.13283380764818337 0.9115632153716917" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_5" pos="3.818010891947373 -2.2709081095375367 0.6004305844406179" mocap="true">
+            <geom type="capsule" size="0.1600483449986283 0.6004305844406179" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_6" pos="-3.8225458136954655 -1.8781623352359365 0.38457949118635376" mocap="true">
+            <geom type="capsule" size="0.16142497978097764 0.38457949118635376" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_7" pos="2.8671798079670108 0.44816107045683484 0.2734955801953863" mocap="true">
+            <geom type="capsule" size="0.06845320364538676 0.2734955801953863" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_8" pos="-3.540543442603399 1.35659232261197 0.5412586417980193" mocap="true">
+            <geom type="capsule" size="0.08766913263305527 0.5412586417980193" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_9" pos="-2.9456790775629518 0.4230713059723952 0.3162603754019131" mocap="true">
+            <geom type="capsule" size="0.067755209713386 0.3162603754019131" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_10" pos="0.4002204765707571 -3.5230773550857704 0.904172643406322" mocap="true">
+            <geom type="capsule" size="0.1682016153930489 0.904172643406322" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_11" pos="-0.24442756612374517 1.57278336849288 0.8577828238043523" mocap="true">
+            <geom type="capsule" size="0.12942745896585287 0.8577828238043523" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_12" pos="-3.4193399995293934 3.719734436635636 0.601889623752865" mocap="true">
+            <geom type="capsule" size="0.07912744181605924 0.601889623752865" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_13" pos="-1.6398596339627138 3.3081081611211456 0.9033576533204553" mocap="true">
+            <geom type="capsule" size="0.14910889426145119 0.9033576533204553" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_14" pos="0.19032512651673006 -2.8338142092360563 0.4237714684080312" mocap="true">
+            <geom type="capsule" size="0.10968468599267125 0.4237714684080312" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_15" pos="1.4894651103276786 1.6471551571400873 0.9626741471722771" mocap="true">
+            <geom type="capsule" size="0.1579980514237112 0.9626741471722771" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_16" pos="-1.8475154372999665 -0.4729236829008725 0.6954375428580818" mocap="true">
+            <geom type="capsule" size="0.09944244539240957 0.6954375428580818" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_17" pos="-2.2893830647247198 -2.8045349978205794 0.7536563469511894" mocap="true">
+            <geom type="capsule" size="0.05991682633999633 0.7536563469511894" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_18" pos="3.6549862071949724 -3.778872192885758 0.9011818195173762" mocap="true">
+            <geom type="capsule" size="0.10343162384003311 0.9011818195173762" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_19" pos="3.154038706176606 3.103704553344868 0.31250206608363085" mocap="true">
+            <geom type="capsule" size="0.050461628577882736 0.31250206608363085" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_20" pos="2.2776719917227393 2.015926485920618 0.6925234432148537" mocap="true">
+            <geom type="capsule" size="0.1848717999239312 0.6925234432148537" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_21" pos="2.0662542305659315 -3.652269989390959 0.3562685002323092" mocap="true">
+            <geom type="capsule" size="0.06460954080885216 0.3562685002323092" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_22" pos="0.45350954472271887 0.7031539207474511 0.4539159612228346" mocap="true">
+            <geom type="capsule" size="0.16919973210870015 0.4539159612228346" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_23" pos="-3.2481396040690864 0.19132491279124864 0.3005037174687888" mocap="true">
+            <geom type="capsule" size="0.17135430352371162 0.3005037174687888" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_24" pos="-2.1191905448041615 0.2769985604064775 0.8223321899577873" mocap="true">
+            <geom type="capsule" size="0.16491765197026775 0.8223321899577873" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_25" pos="-2.570203042221957 0.49181102198395266 0.914031914191588" mocap="true">
+            <geom type="capsule" size="0.13745553426706553 0.914031914191588" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_26" pos="-2.5110104248256704 -3.5117202456150265 0.5989975031526972" mocap="true">
+            <geom type="capsule" size="0.1307794473572222 0.5989975031526972" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_27" pos="-1.9841847821621084 1.041247166777083 0.824844547852754" mocap="true">
+            <geom type="capsule" size="0.16878481311586163 0.824844547852754" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_28" pos="-2.280994036429666 3.9084826116120315 0.6376844156272528" mocap="true">
+            <geom type="capsule" size="0.0559217683436197 0.6376844156272528" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_29" pos="-0.7527525647776407 3.5438127713210443 0.9051307275745353" mocap="true">
+            <geom type="capsule" size="0.1312675297199864 0.9051307275745353" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_30" pos="-3.9288679923074046 3.9142399375919004 0.5760310331632095" mocap="true">
+            <geom type="capsule" size="0.14006782851110666 0.5760310331632095" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_31" pos="-0.698444372178864 -2.159036352855769 0.2830540117169748" mocap="true">
+            <geom type="capsule" size="0.10782510143855567 0.2830540117169748" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_32" pos="3.7634169947890195 -3.396649400099145 0.6294148625651081" mocap="true">
+            <geom type="capsule" size="0.08675471005581187 0.6294148625651081" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_33" pos="-2.9682317092994532 1.7138333303919344 0.2883247501606115" mocap="true">
+            <geom type="capsule" size="0.06847115453827914 0.2883247501606115" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_34" pos="-0.36791258568953644 -1.3834955250134762 0.9434895564789196" mocap="true">
+            <geom type="capsule" size="0.07803576999290854 0.9434895564789196" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_35" pos="0.18620242055745884 -2.974912671483107 0.6662939289869307" mocap="true">
+            <geom type="capsule" size="0.09122862145755602 0.6662939289869307" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_36" pos="2.3447521965156923 2.569216789689029 0.26418795391272876" mocap="true">
+            <geom type="capsule" size="0.1529617924649936 0.26418795391272876" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_37" pos="0.6292230824485046 -3.443536497871457 0.49016609000490385" mocap="true">
+            <geom type="capsule" size="0.14647377233884162 0.49016609000490385" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_38" pos="1.2607997237957411 -1.96938025396937 0.6605299526739741" mocap="true">
+            <geom type="capsule" size="0.13199365894788184 0.6605299526739741" rgba="0 0 1 1"/>
+        </body>
+        
+        <body name="obstacle_39" pos="-2.703970659541201 2.370959473970278 0.7023144663687624" mocap="true">
+            <geom type="capsule" size="0.19096949540743702 0.7023144663687624" rgba="0 0 1 1"/>
+        </body>
+        
+    </worldbody>
+    </mujoco>
+    

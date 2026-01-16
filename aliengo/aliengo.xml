@@ -134,7 +134,6 @@
    
 
     <actuator>       
-        
         <motor name="FR_hip"       gear="1" joint="FR_hip_joint"/>
         <motor name="FR_thigh"       gear="1" joint="FR_thigh_joint"/>
         <motor name="FR_calf"       gear="1" joint="FR_calf_joint"/>
@@ -186,4 +185,7 @@
         <framequat name="Body_Quat" objtype="site" objname="imu"/>
 
     </sensor>
+
+
+
 </mujoco>
