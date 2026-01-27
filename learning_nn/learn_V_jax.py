@@ -52,9 +52,11 @@ os.environ["XLA_FLAGS"] = (
     os.environ.get("XLA_FLAGS", "") + " --xla_gpu_triton_gemm_any=True"
 )
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "True"
+# os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "True"
 
-data_pairs = np.load(f"observation_datasets/pairs_aggregated.npy")  # 3110
+data_pairs = np.load(f"observation_datasets/pairs_aggregated_reduced.npy") # 3110
+
+print(f'Data pairs loaded shape {data_pairs.shape}')
 
 state_size = int(data_pairs.shape[1] / 2 - 2)
 
@@ -74,15 +76,16 @@ np.random.shuffle(data_pairs)
 pairs_len = data_pairs.shape[0]
 
 pairs_partition = []
-sub_batch_len = 500_000
+sub_batch_len = 2_000_000
 n_sub_batch = math.ceil(pairs_len / sub_batch_len)
-for i in range(n_sub_batch):
-    pairs_partition.append(
-        jnp.array(
-            data_pairs[i * sub_batch_len : min(pairs_len, (i + 1) * sub_batch_len)],
-            dtype=jnp.float32,
-        )
-    )
+for i in tqdm(range(n_sub_batch)):
+    # pairs_partition.append(
+    #     np.array(
+    #         data_pairs[i * sub_batch_len : min(pairs_len, (i + 1) * sub_batch_len)],
+    #         dtype=np.float64,
+    #     )
+    # )
+    pairs_partition.append((i * sub_batch_len, min(pairs_len, (i + 1) * sub_batch_len)))
 
 print("Observation dataset shape:", data_pairs.shape)
 
@@ -128,7 +131,7 @@ print(f"Gradient descent steps for epoch: {steps_for_epoch}")
 
 sched = optax.piecewise_constant_schedule(
     init_value=learning_rate,
-    boundaries_and_scales={200 * steps_for_epoch: 1e-1, 1000 * steps_for_epoch: 1e-1},
+    boundaries_and_scales={7000 * steps_for_epoch: 1e-1, 51400 * steps_for_epoch: 1e-1},
 )
 
 optimizer = optax.adam(learning_rate=sched)
@@ -276,7 +279,7 @@ with tqdm(range(epochs), desc="Epoch") as pbar:
         epoch_loss = 0
         batch_losses = []
         for iii in range(len(pairs_partition)):
-            pairs = pairs_partition[iii]
+            pairs = jnp.array(data_pairs[pairs_partition[iii][0]:pairs_partition[iii][1]])
             # pairs = jnp.array(data_pairs[pairs_bounds[0]:pairs_bounds[1]])
             # Calculate the number of full batches and partial batch size
             full_batches_num = pairs.shape[0] // batch_size

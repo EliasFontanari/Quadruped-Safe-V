@@ -4,11 +4,11 @@ import numpy as np
 import time
 
 # Configuration
-n_processes = 18  # Number of parallel processes
+n_processes = 24  # Number of parallel processes
 if len(sys.argv) > 1:
     base_seed = int(sys.argv[1])
 else:
-    base_seed = 100 
+    base_seed = 200 
 
 processes = []
 
@@ -16,7 +16,7 @@ start = time.time()
 # Start all processes
 for i in range(n_processes):
     seed = base_seed + i
-    proc = subprocess.Popen([sys.executable, "main_with_obs_gathering.py", str(seed)]
+    proc = subprocess.Popen([sys.executable, "data_generation/main_with_obs_gathering.py", str(seed)]
                             ,stdout=subprocess.DEVNULL)
     processes.append(proc)
 

@@ -4,7 +4,6 @@ import numpy as np
 timestep = 0.002  # 0.00125
 framerate = 60
 duration = 7
-framerate = 60
 decimation = 10
 
 default_joint_angles = np.array(
@@ -32,8 +31,8 @@ FALL_HEIGHT_THRESHOLD = 0.2  # meters
 CP_SAFE_RADIUS = 0.05  # meters
 G = 9.81
 robot_rad = 0.0
-reached_target_rad = 0.3
-vel_target_reached = 0.8
+reached_target_rad = 0.5
+vel_target_reached = 1
 
 
 # policy scaling
@@ -74,6 +73,7 @@ n_sector = 20
 n_rays = 1000
 view_radius = 7
 body_attached = "trunk"
+view_angle = 2 * np.pi
 
 # Applied noise
 noise_period = 100

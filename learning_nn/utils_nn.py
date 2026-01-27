@@ -1,6 +1,9 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
+from tqdm import tqdm
+import mujoco
+from function_utils.utils import lidar_scan
 
 def generate_pairs(data):
     """
@@ -89,13 +92,16 @@ if not(log_learning):
             x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
-            x = nn.Dense(256)(x)
+            x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
-            x = nn.Dense(256)(x)
+            x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
-            x = nn.Dense(128)(x)
+            x = nn.Dense(512)(x)
+            x = nn.LayerNorm()(x)
+            x = nn.relu(x)
+            x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
             # Output initialized to 1 (probability of survival)
@@ -113,13 +119,16 @@ else:
             x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
-            x = nn.Dense(256)(x)
+            x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
-            x = nn.Dense(256)(x)
+            x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
-            x = nn.Dense(128)(x)
+            x = nn.Dense(512)(x)
+            x = nn.LayerNorm()(x)
+            x = nn.relu(x)
+            x = nn.Dense(512)(x)
             x = nn.LayerNorm()(x)
             x = nn.relu(x)
             # x = nn.Dense(1)(x)

@@ -41,25 +41,35 @@ def run_single_simulation(
     max_steps=10000,
     noise_amp_unif=1.0,
     seed=None,
-    inital_q=None,
+    initial_q=None,
     initial_vel=None
 ):
     # Init data
     data = mujoco.MjData(model)
-
-    if inital_q == None:
+    
+    if isinstance(initial_q, np.ndarray):
+        initial_q_0 = initial_q[0]
+    else:
+        initial_q_0 = initial_q
+    if initial_q_0 == None:
         initially_in_collision = True
-        while initially_in_collision:
-            x_y_init = np.random.uniform(
+        x_y_init = np.random.uniform(
                 -np.array([params.x_lim, params.y_lim]),
                 np.array([params.x_lim, params.y_lim]),
                 2,
             )
-            yaw_init = np.random.uniform(0, 2 * np.pi)  # scalar angle
-            half_yaw = yaw_init / 2
-            quat_init = np.array(
-                [np.cos(half_yaw), 0.0, 0.0, np.sin(half_yaw)]  # w  # x  # y  # z
-            )
+        yaw_init = np.random.uniform(0, 2 * np.pi)  # scalar angle
+        half_yaw = yaw_init / 2
+        quat_init = np.array(
+            [np.cos(half_yaw), 0.0, 0.0, np.sin(half_yaw)]  # w  # x  # y  # z
+        )
+        direction_sampling = np.random.uniform(-1,1,2)
+        direction_sampling = direction_sampling/np.linalg.norm(direction_sampling)
+
+        step_sampling = 0
+        increase_for_step = 0.1
+        while initially_in_collision:
+            x_y_init += direction_sampling * step_sampling * increase_for_step
             data.qpos[:] = np.array(
                 [
                     x_y_init[0],
@@ -76,13 +86,14 @@ def run_single_simulation(
             collisions = get_pairs_collision(data, model)
             if collisions == None:
                 initially_in_collision = False
+            step_sampling +=1
     else:
-        data.qpos[:] = inital_q
+        data.qpos[:] = initial_q
         data.qvel[:] = initial_vel
         mujoco.mj_forward(model, data)
 
     obs_dim = data.qpos.shape[0] + data.qvel.shape[0] + params.n_sector
-    traj = np.zeros((obs_dim + 2, int(max_steps / decimation)))
+    traj = np.zeros((obs_dim + 2, int(max_steps / decimation)+1))
 
     # sample moving_obstacles
     moving_obstacles = np.random.choice(
@@ -267,15 +278,21 @@ def run_single_simulation(
                 (data.qpos, data.qvel, obstacles_scan[0, :])
             )
         if fallen_flag:
-            traj[-2:, int(step / decimation) + 1 * np.sign(step // decimation)] = (
-                np.array([0, 1])
-            )
-            # print('\nCollision\n')
+            try:
+                traj[-2:, int(step / decimation) + 1 * np.sign(step % decimation)] = (
+                    np.array([0, 1])
+                )
+                # print('\nCollision\n')
+            except IndexError:
+                print(f'Error step {step}')
             break
         elif reached_flag and not (fallen_flag):
-            traj[-2:, int(step / decimation) + 1 * np.sign(step // decimation)] = (
-                np.array([1, 0])
-            )
+            try:
+                traj[-2:, int(step / decimation) + 1 * np.sign(step % decimation)] = (
+                    np.array([1, 0])
+                )
+            except IndexError:
+                print(f'Error step {step}')
             # print('\nReached\n')
             break
 
@@ -293,7 +310,7 @@ def run_batch_simulations(
 
     full_state = model.nq + model.nv + params.n_sector + 2
     traj_dataset = np.zeros(
-        (n_episodes, int(params.ep_duration / params.decimation), full_state)
+        (n_episodes, int(params.ep_duration / params.decimation) +1, full_state)
     )
     # allocate necessary memory in RAM
     traj_dataset += 0
@@ -304,14 +321,14 @@ def run_batch_simulations(
     for i in tqdm(range(n_episodes)):
         start = time.time()
 
-        traj_dataset[i], _ = run_single_simulation(
+        traj_dataset[i] = run_single_simulation(
             model,
             actor_network=actor_network,
             noise_amp_unif=params.noise_std,
             seed=seed,
             max_steps=params.ep_duration,
             decimation=params.decimation,
-        ).T
+        )[0].T
 
         end = time.time()
         times.append(end - start)
@@ -331,5 +348,5 @@ def run_batch_simulations(
 
 if __name__ == "__main__":
     run_batch_simulations(
-        n_episodes=750, save_path="observation_datasets", noise_std=0.2
+        n_episodes=750
     )
