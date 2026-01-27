@@ -2,8 +2,8 @@ import yaml
 import torch
 import torch.nn as nn
 from rl_games.algos_torch.running_mean_std import RunningMeanStd
-import params
-
+import configuration.params as params
+ 
 
 # Actor Network Class
 class ActorNetwork(nn.Module):
